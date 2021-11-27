@@ -52,7 +52,7 @@ const companyRegistrationSubmit = () => {
         </label>
         <label class="registrationPage__label registrationPage__label_mt">
           <span>Email</span>
-          <n-input v-model:value="email" placeholder="Введите email" type="email" />
+          <n-input v-model:value="email" placeholder="Введите email" type="text" />
         </label>
         <label class="registrationPage__label registrationPage__label_mt">
           <span>Пароль</span>

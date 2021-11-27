@@ -63,10 +63,10 @@ const submit = () => {
       <label class="createRequestPage__label createRequestPage__label_mt">
         <span>Уровень рекрутера</span>
         <n-space>
-          <n-tag :type="recruiterPrice < 500 ? 'success' : ''">light</n-tag>
-          <n-tag :type="recruiterPrice < 5000 && recruiterPrice >= 500 ? 'success' : ''">medium</n-tag>
-          <n-tag :type="recruiterPrice < 10000 && recruiterPrice >= 5000 ? 'success' : ''">hard</n-tag>
-          <n-tag :type="recruiterPrice >= 10000 ? 'success' : ''">pro</n-tag>
+          <n-tag :type="recruiterPrice < 500 ? 'success' : undefined">light</n-tag>
+          <n-tag :type="recruiterPrice < 5000 && recruiterPrice >= 500 ? 'success' : undefined">medium</n-tag>
+          <n-tag :type="recruiterPrice < 10000 && recruiterPrice >= 5000 ? 'success' : undefined">hard</n-tag>
+          <n-tag :type="recruiterPrice >= 10000 ? 'success' : undefined">pro</n-tag>
         </n-space>
       </label>
       <label class="createRequestPage__label createRequestPage__label_mt" v-if="!remoteWork">
@@ -78,7 +78,7 @@ const submit = () => {
           placeholder="Укажите города"
         />
       </label>
-      <n-checkbox v-model:value="remoteWork" label="Удаленная работа" style="margin-top: 16px" />
+      <n-checkbox v-model:checked="remoteWork" label="Удаленная работа" style="margin-top: 16px" />
       <label class="createRequestPage__label createRequestPage__label_mt">
         <span>Категории</span>
         <n-select
