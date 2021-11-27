@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  client:
+    restart: unless-stopped
+    build: .
+    container_name: rabotov_bot_frontend
+    networks:
+      - server
+
+networks:
+  server:
+    external: true
