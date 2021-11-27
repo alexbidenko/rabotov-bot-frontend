@@ -1,16 +1,18 @@
 <script lang="ts" setup>
-import {NCard, NInput, NButton, NForm} from 'naive-ui';
+import {NCard, NInput, NButton, NForm, useLoadingBar} from 'naive-ui';
 import {ref} from 'vue';
 import {useMutation} from 'villus';
 import {gql} from 'graphql-tag/lib';
 import {useRouter} from 'vue-router';
+import {UserType} from '../types/common';
 
+const loader = useLoadingBar();
 const router = useRouter();
 
 const login = ref('');
 const password = ref('');
 
-const {execute} = useMutation<{ token: string }>(gql`
+const {execute: executeLogin} = useMutation<{ tokenAuth: { token: string } }>(gql`
   mutation TokenAuth {
     tokenAuth(
       username: "$login",
@@ -21,14 +23,34 @@ const {execute} = useMutation<{ token: string }>(gql`
     }
   }
 `);
+const {execute: executeGetUser} = useMutation<{ verifyToken: { payload: UserType } }>(gql`
+  mutation VerifyToken {
+    verifyToken(
+      token: "$token"
+    )
+    {
+      payload
+    }
+  }
+`);
 
-const submit = () => {
-  if (login.value === 'admin') localStorage.setItem('type', 'recruiter');
-  else localStorage.setItem('type', 'company');
-  router.push('/profile');
-
-  return;
-  execute({login: login.value, password: password.value}).then(console.log).catch(console.warn);
+const submit = async () => {
+  loader.start();
+  try {
+    if (false) {
+      const {data: tokenData} = await executeLogin({login: login.value, password: password.value});
+      console.log(tokenData);
+      localStorage.setItem('TOKEN', tokenData.tokenAuth.token);
+      const {data: userData} = await executeGetUser(tokenData.tokenAuth);
+      console.log(userData);
+    }
+    setTimeout(() => {
+      loader.finish();
+      router.push('/profile');
+    }, 500);
+  } catch {
+    loader.error();
+  }
 };
 </script>
 

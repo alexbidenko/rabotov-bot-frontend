@@ -1,8 +1,12 @@
 <script lang="ts" setup>
-import {NCard, NInput, NButton, NForm, NCheckbox} from 'naive-ui';
+import {NCard, NInput, NButton, NForm, NCheckbox, useLoadingBar} from 'naive-ui';
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
+import {useMutation} from 'villus';
+import {UserType} from '../types/common';
+import {gql} from 'graphql-tag';
 
+const loader = useLoadingBar();
 const router = useRouter();
 
 const login = ref('');
@@ -19,14 +23,40 @@ const personal = ref(false);
 
 const companyRegistration = ref(false);
 
-const recruiterRegistrationSubmit = () => {
-  localStorage.setItem('type', 'recruiter');
-  router.push('/profile');
-};
-
 const companyRegistrationSubmit = () => {
   localStorage.setItem('type', 'company');
   router.push('/profile');
+};
+
+const {execute: executeRegistration} = useMutation<{ data: { verifyToken: { payload: UserType } } }>(gql`
+  mutation CreateUser{
+    createUser(
+      firstName: "$firstName",
+      lastName: "$lastName",
+      password: "$password",
+      username: "$login"
+    ) {
+      user {
+        username
+        password
+      }
+    }
+  }
+`);
+
+const recruiterRegistrationSubmit = async () => {
+  loader.start();
+  try {
+    const {data: userData} = await executeRegistration({
+      firstName: firstName.value,
+      $lastName: lastName.value,
+      password: password.value,
+      login: login.value,
+    });
+    console.log(userData);
+  } catch {
+    loader.error();
+  }
 };
 </script>
 

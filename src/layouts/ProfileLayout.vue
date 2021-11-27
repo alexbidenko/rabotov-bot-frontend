@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import {NButton, NLayout, NLayoutContent, NLayoutHeader} from 'naive-ui';
 import {useRouter} from 'vue-router';
+import {useUserStore} from '../store/user';
 
 const router = useRouter();
+const store = useUserStore();
+
+console.log(store.commit('setUser', 1));
+console.log(store.state.user);
 </script>
 
 <template>
@@ -11,7 +16,7 @@ const router = useRouter();
       <router-link to="/">
         <n-button :bordered="false">Главная</n-button>
       </router-link>
-      <n-button :bordered="false" @click="router.back">Назад</n-button>
+      <n-button :bordered="false" @click="router.back" v-if="router.currentRoute.value.path !== '/profile'">Назад</n-button>
     </n-layout-header>
     <n-layout-content content-style="padding: 24px 10vw">
       <router-view></router-view>

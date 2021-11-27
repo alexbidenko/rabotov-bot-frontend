@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {NTabs, NTabPane, NCard, NButton} from 'naive-ui';
+import CandidateCard from '../components/CandidateCard.vue';
 </script>
 
 <template>
@@ -22,12 +23,9 @@ import {NTabs, NTabPane, NCard, NButton} from 'naive-ui';
       </router-link>
     </n-tab-pane>
     <n-tab-pane name="candidates" tab="Список кандидатов">
-      <n-card style="margin-bottom: 16px">
-        Биденко Александр Алексеевич
-      </n-card>
-      <n-card>
-        Копцев Михаил Алексеевич
-      </n-card>
+      <CandidateCard status="review" />
+      <CandidateCard status="meet" />
+      <CandidateCard status="review" />
     </n-tab-pane>
   </n-tabs>
 </template>

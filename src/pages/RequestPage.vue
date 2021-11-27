@@ -1,20 +1,32 @@
 <script setup lang="ts">
-import {NTabs, NTabPane, NCard} from 'naive-ui';
+import {NTabs, NTabPane, NCard, NButton, useDialog} from 'naive-ui';
+import CandidateCard from '../components/CandidateCard.vue';
+
+const dialog = useDialog();
+
+const deleteRequest = () => {
+  dialog.warning({
+    title: 'Отклонение заявки',
+    content: 'Вы уверены что хотите удалить заявку "Frontend разработчик"?',
+    positiveText: 'Подтвердить',
+    negativeText: 'Отмена',
+  });
+};
 </script>
 
 <template>
   <n-card style="margin-bottom: 24px" title="Frontend разработчик">
-    Оплата 140 000 р
+    <template #header-extra>
+      <n-button type="error" @click="deleteRequest">Удалить</n-button>
+    </template>
+    <p>Оплата 140 000 р</p>
+    <n-button type="success">Добавить кандидата</n-button>
   </n-card>
 
   <n-tabs type="line">
     <n-tab-pane name="candidates" tab="Список кандидатов">
-      <n-card style="margin-bottom: 16px">
-        Биденко Александр Алексеевич
-      </n-card>
-      <n-card>
-        Копцев Михаил Алексеевич
-      </n-card>
+      <CandidateCard status="review" />
+      <CandidateCard status="meet" />
     </n-tab-pane>
     <n-tab-pane name="recruiters" tab="Список рекрутеров">
       <router-link to="/profile/1">
