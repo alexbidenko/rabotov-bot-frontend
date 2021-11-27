@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@types/graphql": "^14.5.0",
     "graphql": "^16.0.1",
     "graphql-tag": "^2.12.6",
     "naive-ui": "^2.21.1",
