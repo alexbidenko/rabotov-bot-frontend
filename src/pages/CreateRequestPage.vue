@@ -1,28 +1,25 @@
 <script setup lang="ts">
 import {NCard, NInput, NInputNumber, NTag, NSpace, NForm, NSelect, NCheckbox, NButton} from 'naive-ui';
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
+import {useQuery} from 'villus';
+import {CATEGORIES_QUERY, CategoriesQuery, CITIES_QUERY, CitiesQuery} from '../api/additional';
 
-const CITIES = [
-  'Новороссийск',
-  'Краснодар',
-  'Сочи',
-  'Геленджик',
-  'Москва',
-].map((el) => ({
-  label: el,
-  value: el,
-}));
+const {data: cities} = useQuery<CitiesQuery>({
+  query: CITIES_QUERY,
+});
+const citiesData = computed(() => cities.value && cities.value.map((el) => ({
+  value: el.id,
+  label: el.cityName,
+})));
 
-const CATEGORIES = [
-  'IT',
-  'Транспорт',
-  'Питание',
-  'Иное',
-].map((el) => ({
-  label: el,
-  value: el,
-}));
+const {data: categories} = useQuery<CategoriesQuery>({
+  query: CATEGORIES_QUERY,
+});
+const categoriesData = computed(() => categories.value && categories.value.map((el) => ({
+  value: el.id,
+  label: el.categoryName,
+})));
 
 const router = useRouter();
 
@@ -74,7 +71,7 @@ const submit = () => {
         <n-select
           filterable
           multiple
-          :options="CITIES"
+          :options="citiesData"
           placeholder="Укажите города"
         />
       </label>
@@ -84,7 +81,7 @@ const submit = () => {
         <n-select
           filterable
           multiple
-          :options="CATEGORIES"
+          :options="categoriesData"
           placeholder="Укажите категории"
         />
       </label>

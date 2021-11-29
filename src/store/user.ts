@@ -1,19 +1,27 @@
 import {InjectionKey} from 'vue';
 import {createStore, useStore, Store} from 'vuex';
+import {UserType} from '../types/common';
 
-export interface State {
-  user: null,
-}
+export type State = {
+  user: UserType;
+  isAuthorized: boolean;
+};
 
 export const userKey: InjectionKey<Store<State>> = Symbol();
 
 export default createStore<State>({
   state: () => ({
-    user: null,
+    user: {} as UserType,
+    isAuthorized: false,
   }),
   mutations: {
     setUser: (state, value) => {
       state.user = value;
+      state.isAuthorized = true;
+    },
+    logout: (state) => {
+      state.user = {} as UserType;
+      state.isAuthorized = false;
     },
   },
 });

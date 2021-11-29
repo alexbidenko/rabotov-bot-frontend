@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {NConfigProvider, NLoadingBarProvider, NDialogProvider} from 'naive-ui';
+import {NConfigProvider, NLoadingBarProvider, NDialogProvider, NMessageProvider} from 'naive-ui';
 import {lightTheme} from 'naive-ui/es/themes/light';
 
 </script>
@@ -8,7 +8,9 @@ import {lightTheme} from 'naive-ui/es/themes/light';
   <n-config-provider :theme="lightTheme">
     <n-dialog-provider>
       <n-loading-bar-provider>
-        <router-view />
+        <n-message-provider>
+          <router-view />
+        </n-message-provider>
       </n-loading-bar-provider>
     </n-dialog-provider>
   </n-config-provider>

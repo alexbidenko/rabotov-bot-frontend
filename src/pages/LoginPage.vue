@@ -1,53 +1,34 @@
 <script lang="ts" setup>
 import {NCard, NInput, NButton, NForm, useLoadingBar} from 'naive-ui';
 import {ref} from 'vue';
-import {useMutation} from 'villus';
-import {gql} from 'graphql-tag/lib';
 import {useRouter} from 'vue-router';
-import {UserType} from '../types/common';
+import {useUserStore} from '../store/user';
+import {GET_USER_MUTATION, GetUserMutation, LOGIN_MUTATION, LoginMutation} from '../api/user';
+import {useMutation} from 'villus';
 
 const loader = useLoadingBar();
 const router = useRouter();
+const store = useUserStore();
 
 const login = ref('');
 const password = ref('');
 
-const {execute: executeLogin} = useMutation<{ tokenAuth: { token: string } }>(gql`
-  mutation TokenAuth {
-    tokenAuth(
-      username: "$login",
-      password: "$password"
-    )
-    {
-      token
-    }
-  }
-`);
-const {execute: executeGetUser} = useMutation<{ verifyToken: { payload: UserType } }>(gql`
-  mutation VerifyToken {
-    verifyToken(
-      token: "$token"
-    )
-    {
-      payload
-    }
-  }
-`);
+const loginMutation = useMutation<LoginMutation>(LOGIN_MUTATION);
+const getUserMutation = useMutation<GetUserMutation>(GET_USER_MUTATION);
+
+if (store.state.isAuthorized) router.push('/profile');
 
 const submit = async () => {
   loader.start();
   try {
-    if (false) {
-      const {data: tokenData} = await executeLogin({login: login.value, password: password.value});
-      console.log(tokenData);
-      localStorage.setItem('TOKEN', tokenData.tokenAuth.token);
-      const {data: userData} = await executeGetUser(tokenData.tokenAuth);
-      console.log(userData);
+    const {data: tokenData} = await loginMutation.execute({login: login.value, password: password.value});
+    const {data: userData, error} = await getUserMutation.execute(tokenData);
+    if (!error) {
+      store.commit('setUser', userData.payload);
+      localStorage.setItem('TOKEN', tokenData.token);
+      await router.push('/profile');
     }
-    setTimeout(() => {
-      loader.finish();
-      router.push('/profile');
-    }, 500);
+    loader.finish();
   } catch {
     loader.error();
   }

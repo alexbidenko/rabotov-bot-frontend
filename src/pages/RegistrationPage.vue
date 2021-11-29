@@ -3,11 +3,17 @@ import {NCard, NInput, NButton, NForm, NCheckbox, useLoadingBar} from 'naive-ui'
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {useMutation} from 'villus';
-import {UserType} from '../types/common';
-import {gql} from 'graphql-tag';
+import {useUserStore} from '../store/user';
+import {
+  CREATE_EMPLOYER_MUTATION, CREATE_RECRUITER_MUTATION,
+  CREATE_USER_MUTATION, CreateEmployerMutation, CreateRecruiterMutation,
+  CreateUserMutation, GET_USER_MUTATION, GetUserMutation,
+  LOGIN_MUTATION, LoginMutation,
+} from '../api/user';
 
 const loader = useLoadingBar();
 const router = useRouter();
+const store = useUserStore();
 
 const login = ref('');
 const password = ref('');
@@ -23,37 +29,62 @@ const personal = ref(false);
 
 const companyRegistration = ref(false);
 
-const companyRegistrationSubmit = () => {
-  localStorage.setItem('type', 'company');
-  router.push('/profile');
-};
+if (store.state.isAuthorized) router.push('/profile');
 
-const {execute: executeRegistration} = useMutation<{ data: { verifyToken: { payload: UserType } } }>(gql`
-  mutation CreateUser{
-    createUser(
-      firstName: "$firstName",
-      lastName: "$lastName",
-      password: "$password",
-      username: "$login"
-    ) {
-      user {
-        username
-        password
-      }
-    }
+const createUserMutation = useMutation<CreateUserMutation>(CREATE_USER_MUTATION);
+const loginMutation = useMutation<LoginMutation>(LOGIN_MUTATION);
+const getUserMutation = useMutation<GetUserMutation>(GET_USER_MUTATION);
+const createRecruiterMutation = useMutation<CreateRecruiterMutation>(CREATE_RECRUITER_MUTATION);
+const createEmployerMutation = useMutation<CreateEmployerMutation>(CREATE_EMPLOYER_MUTATION);
+
+const userRegistration = async () => {
+  try {
+    const {error: userError} = await createUserMutation.execute({
+      firstName: firstName.value,
+      lastName: lastName.value,
+      password: password.value,
+      username: login.value,
+      email: email.value,
+    });
+    if (userError) throw new Error(userError.message);
+    const {data: tokenData, error: tokenError} = await loginMutation.execute({
+      password: password.value,
+      login: login.value,
+    });
+    if (tokenError) throw new Error(tokenError.message);
+    const {data: userData, error} = await getUserMutation.execute(tokenData);
+    if (error) throw new Error(error.message);
+    store.commit('setUser', userData.payload);
+    localStorage.setItem('TOKEN', tokenData.token);
+  } catch {
+    loader.error();
   }
-`);
+};
 
 const recruiterRegistrationSubmit = async () => {
   loader.start();
   try {
-    const {data: userData} = await executeRegistration({
-      firstName: firstName.value,
-      $lastName: lastName.value,
-      password: password.value,
-      login: login.value,
+    await userRegistration();
+    const response = await createRecruiterMutation.execute();
+    if (response.error) throw new Error(response.error.message);
+    loader.finish();
+  } catch {
+    loader.error();
+  }
+};
+
+const companyRegistrationSubmit = async () => {
+  loader.start();
+  try {
+    await userRegistration();
+    const response = await createEmployerMutation.execute({
+      companyName: companyName.value,
+      inn: inn.value,
+      isPhysical: personal.value,
     });
-    console.log(userData);
+    if (response.error) throw new Error(response.error.message);
+    loader.finish();
+    await router.push('/profile');
   } catch {
     loader.error();
   }
