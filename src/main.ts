@@ -8,7 +8,7 @@ const client = createClient({
   url: 'https://api-rabotov.admire.social/gql/',
   use: [
     ({opContext, afterQuery}) => {
-      if (localStorage.TOKEN) opContext.headers.Authorization = `Bearer ${localStorage.TOKEN}`;
+      if (localStorage.TOKEN) opContext.headers.Authorization = `JWT ${localStorage.TOKEN}`;
       afterQuery((r) => {
         if (!r.error) r.data = r.data[Object.keys(r.data)[0]];
       });

@@ -15,7 +15,7 @@ export default createStore<State>({
     isAuthorized: false,
   }),
   mutations: {
-    setUser: (state, value) => {
+    setUser: (state, value: UserType) => {
       state.user = value;
       state.isAuthorized = true;
     },

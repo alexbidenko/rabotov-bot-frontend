@@ -68,6 +68,7 @@ const recruiterRegistrationSubmit = async () => {
     const response = await createRecruiterMutation.execute();
     if (response.error) throw new Error(response.error.message);
     loader.finish();
+    await router.push('/profile');
   } catch {
     loader.error();
   }
